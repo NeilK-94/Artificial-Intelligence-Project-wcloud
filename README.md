@@ -1,5 +1,17 @@
-AI Assignment
+# A Web Opinion Visualiser
+**Neil Kyne**
 
+### About the project
+The program takes a search term from the user and searches DuckDuckGo usig a search algorithm for the most commonly occuring words for that search term. It then builds a word cloud from those words.
+
+### Technologies used
+* [JFuzzyLogic](http://jfuzzylogic.sourceforge.net/html/index.html) 
+* [Jsoup 1.12.1](https://jsoup.org/)
+
+### How to run
+Deploy the .war file in a running Apache Tomcat's webapps directory. Then navigate to ```localhost:8080/wloud```
+
+### Assignment Implementation
 I have used thread pooling for the multithreaded aspect of the project.
 
 In ServiceHandler I perform an initial search of the duck duck go page, this gives back 10 links/results, from there each of those links is passed in to the NodeSearcher to be parsed and scored. Each node is it's own thread in the thread pool.
