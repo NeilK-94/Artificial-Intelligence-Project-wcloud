@@ -1,0 +1,59 @@
+FUNCTION_BLOCK relevanceRate
+
+	VAR_INPUT	//	Three inputs to search for on each page
+	 	title: REAL;
+	 	headings: REAL;	//	Could possibly search for multiple types of headings (h1, h2, h3) later
+	 	body: REAL;
+	END_VAR
+
+	VAR_OUTPUT
+		 relevance : REAL;
+	END_VAR
+
+	//	Fuzzify input variable 'title': {'poor', 'good' , 'excellent'}
+	FUZZIFY title	
+		TERM poor := (0, 1);	 
+		TERM good := (1, 1);
+		//TERM excellent := (6, 0) (9, 1);
+	END_FUZZIFY
+	
+	//	Fuzzify input variable 'headings': {'poor', 'good' , 'excellent'}
+	FUZZIFY headings			
+		TERM poor := (0, 1) (5, 0);
+		TERM good := (6, 0)(15, 1);
+		//TERM excellent := (6, 0) (9, 1);
+	END_FUZZIFY
+	
+	//	Fuzzify input variable 'body': {'poor', 'good' , 'excellent'}
+	FUZZIFY body		
+		TERM poor := (0, 1) (8, 0);
+		TERM good := (8, 0) (20, 1);
+		TERM excellent := (21, 0) (40, 1);
+	END_FUZZIFY
+	
+	//	Degree of relevance : {'low', 'medium', 'high' }
+	DEFUZZIFY relevance
+		TERM low := (0,0) (2,1) (3,0);
+		TERM medium := (3,0) (5,1) (6,0);
+		TERM high := (7,0) (10,1) (10,0);
+		METHOD : COG;
+		DEFAULT := 0;	
+	END_DEFUZZIFY
+	
+	//	Inference rules
+	RULEBLOCK No1
+		AND : MIN;	// Use 'min' for 'and'
+		ACT : MIN;	// Use 'min' activation method
+		ACCU : MAX;	// Use 'max' accumulation method
+		
+		RULE 1 : IF title IS poor OR headings IS poor THEN relevance IS low;
+		RULE 2 : IF title IS good OR headings IS good THEN relevance IS medium;
+		RULE 3 : IF title IS good AND headings IS good THEN relevance IS high;
+		RULE 4 : IF body IS poor AND headings is poor THEN relevance IS low;
+		RULE 5 : IF body IS good AND title is poor THEN relevance IS medium;
+		RULE 6 : IF body IS excellent THEN relevance IS high;
+		
+	END_RULEBLOCK
+
+
+END_FUNCTION_BLOCK
